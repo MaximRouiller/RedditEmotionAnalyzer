@@ -41,7 +41,7 @@
         public int pwls { get; set; }
         public object link_flair_css_class { get; set; }
         public int downs { get; set; }
-        public int thumbnail_height { get; set; }
+        public int? thumbnail_height { get; set; }
         public string parent_whitelist_status { get; set; }
         public bool hide_score { get; set; }
         public string name { get; set; }
@@ -52,7 +52,7 @@
         public string subreddit_type { get; set; }
         public int ups { get; set; }
         public int total_awards_received { get; set; }
-        public int thumbnail_width { get; set; }
+        public int? thumbnail_width { get; set; }
         public string author_flair_template_id { get; set; }
         public bool is_original_content { get; set; }
         public string author_fullname { get; set; }

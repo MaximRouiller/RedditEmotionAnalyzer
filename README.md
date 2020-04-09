@@ -26,7 +26,7 @@ This can be done by simply clicking the button below and filling the required fi
 We need to first clone the repository.
 
 ```bash
-git clone https://github..com/MaximRouiller/RedditEmotionAnalyzer
+git clone https://github.com/MaximRouiller/RedditEmotionAnalyzer
 ```
 
 ### With Visual Studio
