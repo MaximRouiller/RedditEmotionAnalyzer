@@ -22,7 +22,7 @@ namespace RedditEmotionAnalyzer.App
 
         [FunctionName("AnalyzeRedditThread")]
         public static async Task<IActionResult> AnalyzeThread(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
         {
             var client = HttpClientFactory.Create();
