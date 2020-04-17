@@ -24,6 +24,8 @@ document.addEventListener('readystatechange', (event) => {
 
                                 if (result.runtimeStatus === "Completed") {
                                     let output = result.output
+                                    let detailedResult = `Positive: ${output.Positive}<br/>Negative: ${output.Negative}<br/>Neutral: ${output.Neutral}<br/>Mixed: ${output.Mixed}`;
+                                    document.getElementById('detailedResult').innerHTML = detailedResult;
                                     if (output.Positive > output.Negative && output.Positive > output.Neutral) {
                                         document.getElementById('imageResult').src = 'icons/reddit-128-happy.png';
                                     }
@@ -32,7 +34,11 @@ document.addEventListener('readystatechange', (event) => {
                                         document.getElementById('imageResult').src = 'icons/reddit-128-sad.png';
                                     }
 
-                                    if (output.Neutral > output.Positive && output.Neutral > output.Negative) {
+                                    if (output.Neutral >= output.Positive && output.Neutral >= output.Negative) {
+                                        document.getElementById('imageResult').src = 'icons/reddit-128-neutral.png';
+                                    }
+
+                                    if (output.Mixed >= output.Positive && output.Mixed >= output.Negative) {
                                         document.getElementById('imageResult').src = 'icons/reddit-128-neutral.png';
                                     }
                                 }
@@ -43,23 +49,3 @@ document.addEventListener('readystatechange', (event) => {
         });
     }
 });
-
-
-
-const sendMessageId = document.getElementById("sendmessageid");
-if (sendMessageId) {
-    sendMessageId.onclick = function () {
-        chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-            chrome.tabs.sendMessage(
-                tabs[0].id,
-                {
-                    url: chrome.extension.getURL("icons/reddit-512-happy.png"),
-                    tabId: tabs[0].id
-                },
-                function (response) {
-                    window.close();
-                }
-            );
-        });
-    };
-}
