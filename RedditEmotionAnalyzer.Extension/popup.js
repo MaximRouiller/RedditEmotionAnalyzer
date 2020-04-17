@@ -3,7 +3,6 @@ document.addEventListener('readystatechange', (event) => {
         chrome.tabs.query({ active: true, lastFocusedWindow: true }, tabs => {
             let url = tabs[0].url;
 
-            // url to call: https://redditemotionanalyzerapp20200415132941.azurewebsites.net/api/RedditThreadAnalyzer_HttpStart?url=
             let apiUri = `https://redditemotionanalyzerapp20200415132941.azurewebsites.net/api/RedditThreadAnalyzer_HttpStart?url=${encodeURIComponent(url)}`;
             let intervalId;
             fetch(apiUri)
@@ -24,7 +23,7 @@ document.addEventListener('readystatechange', (event) => {
 
                                 if (result.runtimeStatus === "Completed") {
                                     let output = result.output
-                                    let detailedResult = `Positive: ${output.Positive}<br/>Negative: ${output.Negative}<br/>Neutral: ${output.Neutral}<br/>Mixed: ${output.Mixed}`;
+                                    let detailedResult = `Positive: ${output.Positive.toFixed(2)}%<br/>Negative: ${output.Negative.toFixed(2)}%<br/>Neutral: ${output.Neutral.toFixed(2)}%<br/>Mixed: ${output.Mixed.toFixed(2)}%`;
                                     document.getElementById('detailedResult').innerHTML = detailedResult;
                                     if (output.Positive > output.Negative && output.Positive > output.Neutral) {
                                         document.getElementById('imageResult').src = 'icons/reddit-128-happy.png';
