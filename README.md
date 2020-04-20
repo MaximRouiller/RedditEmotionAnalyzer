@@ -9,8 +9,8 @@ This JSON file contains data about the thread as well as the first 200 comments 
 You will need the following:
 
 * Latest LTS of .NET Core
-* Azure Account (free trial available)
-* Create a Cognitive Services Text Analytics service
+* Azure Account ([free trial available](https://azure.microsoft.com/free/?WT.mc_id=redditemotion-github-marouill))
+* Create a Cognitive Services Text Analytics service (see below)
 * Creating a `local.settings.json` file
     * `CognitiveServices_Key` environment variable containing the Cognitive Services Key
     * `CognitiveServices_Endpoint` environment variable containing the Cognitive Services Endpoint

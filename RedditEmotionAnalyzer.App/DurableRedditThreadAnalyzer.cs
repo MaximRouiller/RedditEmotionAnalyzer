@@ -57,15 +57,6 @@ namespace RedditEmotionAnalyzer.App
                 Neutral = (decimal)x.Neutral,
                 Mixed = (decimal)x.Mixed
             }).SingleOrDefault();
-            //TableQuery<AnalyzedRedditThreadEntity> query = table.CreateQuery<AnalyzedRedditThreadEntity>()
-            //return table.ExecuteQuery<AnalyzedRedditThreadEntity>(query)                
-            //    .Select(x => new RedditEmotionResult
-            //    {
-            //        Positive = x.Positive,
-            //        Negative = x.Negative,
-            //        Neutral = x.Neutral,
-            //        Mixed = x.Mixed
-            //    }).SingleOrDefault();
         }
 
         [FunctionName("RedditThreadAnalyzer_SaveResults")]
