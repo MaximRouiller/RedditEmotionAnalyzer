@@ -22,6 +22,32 @@ namespace RedditEmotionAnalyzer.App
         private static readonly Uri endpoint = new Uri(Environment.GetEnvironmentVariable("CognitiveServices_Endpoint", EnvironmentVariableTarget.Process));
         private static readonly string storageConnectionString = Environment.GetEnvironmentVariable("AzureWebJobsStorage", EnvironmentVariableTarget.Process);
 
+        private static string HashString(string input)
+        {
+            var bytes = System.Text.Encoding.UTF8.GetBytes(input);
+            return HttpUtility.UrlEncode(Convert.ToBase64String(bytes));
+        }
+
+        [FunctionName("RedditThreadAnalyzer_HttpStart")]
+        public static async Task<HttpResponseMessage> HttpStart(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestMessage req,
+            [DurableClient] IDurableOrchestrationClient starter,
+            ILogger log)
+        {
+            var client = HttpClientFactory.Create();
+            var query = HttpUtility.ParseQueryString(req.RequestUri.Query);
+            var url = new Uri(HttpUtility.UrlDecode(query.Get("url")));
+
+            var postJsonUrl = url.AbsoluteUri + ".json";
+
+            // Function input comes from the request content.
+            string instanceId = await starter.StartNewAsync("RedditThreadAnalyzer", input: postJsonUrl);
+
+            log.LogInformation($"Started orchestration with ID = '{instanceId}'.");
+
+            return starter.CreateCheckStatusResponse(req, instanceId);
+        }
+
         [FunctionName("RedditThreadAnalyzer")]
         public static async Task<RedditEmotionResult> RunOrchestrator(
             [OrchestrationTrigger] IDurableOrchestrationContext context)
@@ -29,7 +55,7 @@ namespace RedditEmotionAnalyzer.App
             string redditJsonUrl = context.GetInput<string>();
 
             var existingResult = await context.CallActivityAsync<RedditEmotionResult>("RedditThreadAnalyzer_GetExistingEmotionResult", redditJsonUrl);
-            if(existingResult != null)
+            if (existingResult != null)
             {
                 return existingResult;
             }
@@ -57,35 +83,6 @@ namespace RedditEmotionAnalyzer.App
                 Neutral = (decimal)x.Neutral,
                 Mixed = (decimal)x.Mixed
             }).SingleOrDefault();
-        }
-
-        [FunctionName("RedditThreadAnalyzer_SaveResults")]
-        public static async Task SaveResults([ActivityTrigger] SaveResultInput result)
-        {
-            CloudStorageAccount account;
-            CloudStorageAccount.TryParse(storageConnectionString, out account);
-            CloudTableClient client = account.CreateCloudTableClient();
-            CloudTable table = client.GetTableReference("AnalyzedRedditThread");
-            await table.CreateIfNotExistsAsync();
-
-            var entity = new AnalyzedRedditThreadEntity();
-            entity.PartitionKey = "default";
-            entity.RowKey = HashString(result.Url);
-            entity.Url = result.Url;
-            entity.Positive = (double)result.EmotionResult.Positive;
-            entity.Negative = (double)result.EmotionResult.Negative;
-            entity.Neutral = (double)result.EmotionResult.Neutral;
-            entity.Mixed = (double)result.EmotionResult.Mixed;
-            entity.ProcessedDate = DateTime.UtcNow;
-
-            var operation = TableOperation.InsertOrReplace(entity);
-            await table.ExecuteAsync(operation);
-        }
-
-        private static string HashString(string input)
-        {
-            var bytes = System.Text.Encoding.UTF8.GetBytes(input);
-            return HttpUtility.UrlEncode(Convert.ToBase64String(bytes));
         }
 
         [FunctionName("RedditThreadAnalyzer_ParseAllComments")]
@@ -123,24 +120,27 @@ namespace RedditEmotionAnalyzer.App
             };
         }
 
-        [FunctionName("RedditThreadAnalyzer_HttpStart")]
-        public static async Task<HttpResponseMessage> HttpStart(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestMessage req,
-            [DurableClient] IDurableOrchestrationClient starter,
-            ILogger log)
+        [FunctionName("RedditThreadAnalyzer_SaveResults")]
+        public static async Task SaveResults([ActivityTrigger] SaveResultInput result)
         {
-            var client = HttpClientFactory.Create();
-            var query = HttpUtility.ParseQueryString(req.RequestUri.Query);
-            var url = new Uri(HttpUtility.UrlDecode(query.Get("url")));
+            CloudStorageAccount account;
+            CloudStorageAccount.TryParse(storageConnectionString, out account);
+            CloudTableClient client = account.CreateCloudTableClient();
+            CloudTable table = client.GetTableReference("AnalyzedRedditThread");
+            await table.CreateIfNotExistsAsync();
 
-            var postJsonUrl = url.AbsoluteUri + ".json";
+            var entity = new AnalyzedRedditThreadEntity();
+            entity.PartitionKey = "default";
+            entity.RowKey = HashString(result.Url);
+            entity.Url = result.Url;
+            entity.Positive = (double)result.EmotionResult.Positive;
+            entity.Negative = (double)result.EmotionResult.Negative;
+            entity.Neutral = (double)result.EmotionResult.Neutral;
+            entity.Mixed = (double)result.EmotionResult.Mixed;
+            entity.ProcessedDate = DateTime.UtcNow;
 
-            // Function input comes from the request content.
-            string instanceId = await starter.StartNewAsync("RedditThreadAnalyzer", input: postJsonUrl);
-
-            log.LogInformation($"Started orchestration with ID = '{instanceId}'.");
-
-            return starter.CreateCheckStatusResponse(req, instanceId);
+            var operation = TableOperation.InsertOrReplace(entity);
+            await table.ExecuteAsync(operation);
         }
     }
 }
