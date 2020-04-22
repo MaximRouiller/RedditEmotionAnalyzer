@@ -34,7 +34,6 @@ namespace RedditEmotionAnalyzer.App
             [DurableClient] IDurableOrchestrationClient starter,
             ILogger log)
         {
-            var client = HttpClientFactory.Create();
             var query = HttpUtility.ParseQueryString(req.RequestUri.Query);
             var url = new Uri(HttpUtility.UrlDecode(query.Get("url")));
 
@@ -70,8 +69,7 @@ namespace RedditEmotionAnalyzer.App
         [FunctionName("RedditThreadAnalyzer_GetExistingEmotionResult")]
         public static async Task<RedditEmotionResult> GetExistingEmotionResult([ActivityTrigger] string url)
         {
-            CloudStorageAccount account;
-            CloudStorageAccount.TryParse(storageConnectionString, out account);
+            _ = CloudStorageAccount.TryParse(storageConnectionString, out CloudStorageAccount account);
             CloudTableClient client = account.CreateCloudTableClient();
             CloudTable table = client.GetTableReference("AnalyzedRedditThread");
             await table.CreateIfNotExistsAsync();
@@ -109,7 +107,7 @@ namespace RedditEmotionAnalyzer.App
             TextAnalyticsClient textAnalyticClient = new TextAnalyticsClient(endpoint, credentials);
             IEnumerable<string> sentimentResult = (await textAnalyticClient.AnalyzeSentimentBatchAsync(commentsToAnalyze)).Value.Select(x => x.DocumentSentiment.Sentiment.ToString()).ToList();
 
-            Func<string, decimal> percentage = (sentiment) => sentimentResult.Where(x => x == sentiment).Count() / (decimal)commentsToAnalyze.Count * 100;
+            decimal percentage(string sentiment) => sentimentResult.Where(x => x == sentiment).Count() / (decimal)commentsToAnalyze.Count * 100;
 
             return new RedditEmotionResult
             {
@@ -123,21 +121,22 @@ namespace RedditEmotionAnalyzer.App
         [FunctionName("RedditThreadAnalyzer_SaveResults")]
         public static async Task SaveResults([ActivityTrigger] SaveResultInput result)
         {
-            CloudStorageAccount account;
-            CloudStorageAccount.TryParse(storageConnectionString, out account);
+            CloudStorageAccount.TryParse(storageConnectionString, out CloudStorageAccount account);
             CloudTableClient client = account.CreateCloudTableClient();
             CloudTable table = client.GetTableReference("AnalyzedRedditThread");
             await table.CreateIfNotExistsAsync();
 
-            var entity = new AnalyzedRedditThreadEntity();
-            entity.PartitionKey = "default";
-            entity.RowKey = HashString(result.Url);
-            entity.Url = result.Url;
-            entity.Positive = (double)result.EmotionResult.Positive;
-            entity.Negative = (double)result.EmotionResult.Negative;
-            entity.Neutral = (double)result.EmotionResult.Neutral;
-            entity.Mixed = (double)result.EmotionResult.Mixed;
-            entity.ProcessedDate = DateTime.UtcNow;
+            var entity = new AnalyzedRedditThreadEntity
+            {
+                PartitionKey = "default",
+                RowKey = HashString(result.Url),
+                Url = result.Url,
+                Positive = (double)result.EmotionResult.Positive,
+                Negative = (double)result.EmotionResult.Negative,
+                Neutral = (double)result.EmotionResult.Neutral,
+                Mixed = (double)result.EmotionResult.Mixed,
+                ProcessedDate = DateTime.UtcNow
+            };
 
             var operation = TableOperation.InsertOrReplace(entity);
             await table.ExecuteAsync(operation);
