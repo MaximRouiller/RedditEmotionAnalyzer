@@ -22,7 +22,7 @@
             "name": "[parameters('cognitiveServiceName')]",
             "location": "eastus",
             "sku": {
-                "name": "S0"
+                "name": "F0"
             },
             "kind": "TextAnalytics",
             "properties": {
