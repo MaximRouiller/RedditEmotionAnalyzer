@@ -3,15 +3,12 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "cognitiveServiceName": {
-            "defaultValue": "RedditEmotionAnalyzer",
             "type": "String"
         },
         "storageAccountName": {
-            "defaultValue": "[concat(toLower(parameters('AzFunctionName')), 'storage')]",
             "type": "String"
         },
         "AzFunctionName": {
-            "defaultValue": "RedditEmotionAnalyzerApp20200415132941",
             "type": "String"
         }
     },
