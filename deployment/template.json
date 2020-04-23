@@ -2,42 +2,40 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "serverfarms_EastUSPlan_name": {
-            "defaultValue": "EastUSPlan",
-            "type": "String"
-        },
-        "accounts_RedditEmotionAnalyzer_name": {
+        "cognitiveServiceName": {
             "defaultValue": "RedditEmotionAnalyzer",
             "type": "String"
         },
-        "storageAccounts_redditemotionanalyzerapp_name": {
-            "defaultValue": "redditemotionanalyzerapp",
+        "storageAccountName": {
+            "defaultValue": "[toLower(concat(parameters('AzFunctionName'), 'storage'))]",
             "type": "String"
         },
-        "sites_RedditEmotionAnalyzerApp20200415132941_name": {
+        "AzFunctionName": {
             "defaultValue": "RedditEmotionAnalyzerApp20200415132941",
             "type": "String"
         }
     },
-    "variables": {},
+    "variables": {
+        "AppServicePlan": "[concat(parameters('cognitiveServiceName'), 'Plan')]" 
+    },
     "resources": [
         {
             "type": "Microsoft.CognitiveServices/accounts",
             "apiVersion": "2017-04-18",
-            "name": "[parameters('accounts_RedditEmotionAnalyzer_name')]",
+            "name": "[parameters('cognitiveServiceName')]",
             "location": "eastus",
             "sku": {
                 "name": "S0"
             },
             "kind": "TextAnalytics",
             "properties": {
-                "customSubDomainName": "[parameters('accounts_RedditEmotionAnalyzer_name')]"
+                "customSubDomainName": "[parameters('cognitiveServiceName')]"
             }
         },
         {
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2019-06-01",
-            "name": "[parameters('storageAccounts_redditemotionanalyzerapp_name')]",
+            "name": "[parameters('storageAccountName')]",
             "location": "eastus",
             "sku": {
                 "name": "Standard_LRS",
@@ -68,7 +66,7 @@
         {
             "type": "Microsoft.Web/serverfarms",
             "apiVersion": "2018-02-01",
-            "name": "[parameters('serverfarms_EastUSPlan_name')]",
+            "name": "[variables('AppServicePlan')]",
             "location": "East US",
             "sku": {
                 "name": "Y1",
@@ -92,9 +90,9 @@
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices",
             "apiVersion": "2019-06-01",
-            "name": "[concat(parameters('storageAccounts_redditemotionanalyzerapp_name'), '/default')]",
+            "name": "[concat(parameters('storageAccountName'), '/default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_redditemotionanalyzerapp_name'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
             ],
             "sku": {
                 "name": "Standard_LRS",
@@ -112,9 +110,9 @@
         {
             "type": "Microsoft.Storage/storageAccounts/fileServices",
             "apiVersion": "2019-06-01",
-            "name": "[concat(parameters('storageAccounts_redditemotionanalyzerapp_name'), '/default')]",
+            "name": "[concat(parameters('storageAccountName'), '/default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_redditemotionanalyzerapp_name'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
             ],
             "sku": {
                 "name": "Standard_LRS",
@@ -129,15 +127,15 @@
         {
             "type": "Microsoft.Web/sites",
             "apiVersion": "2018-11-01",
-            "name": "[parameters('sites_RedditEmotionAnalyzerApp20200415132941_name')]",
+            "name": "[parameters('AzFunctionName')]",
             "location": "East US",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_EastUSPlan_name'))]"
+                "[resourceId('Microsoft.Web/serverfarms', variables('AppServicePlan'))]"
             ],
             "kind": "functionapp",
             "properties": {
                 "enabled": true,
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_EastUSPlan_name'))]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('AppServicePlan'))]",
                 "reserved": false,
                 "isXenon": false,
                 "hyperV": false,
@@ -154,10 +152,10 @@
         {
             "type": "Microsoft.Web/sites/config",
             "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('sites_RedditEmotionAnalyzerApp20200415132941_name'), '/web')]",
+            "name": "[concat(parameters('AzFunctionName'), '/web')]",
             "location": "East US",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_RedditEmotionAnalyzerApp20200415132941_name'))]"
+                "[resourceId('Microsoft.Web/sites', parameters('AzFunctionName'))]"
             ],
             "properties": {
                 "numberOfWorkers": -1,
