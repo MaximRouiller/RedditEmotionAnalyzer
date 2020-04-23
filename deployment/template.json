@@ -27,7 +27,7 @@
             "name": "[parameters('accounts_RedditEmotionAnalyzer_name')]",
             "location": "eastus",
             "sku": {
-                "name": "F0"
+                "name": "S0"
             },
             "kind": "TextAnalytics",
             "properties": {
