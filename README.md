@@ -21,6 +21,13 @@ This can be done by simply clicking the button below and filling the required fi
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FMaximRouiller%2FOneClickCognitiveServices%2Fmaster%2Fcognitiveservices%2FTextAnalytics.json)
 
+## Deploy Sample Resources
+
+All necessary resources to deploy this sample will be deployed by clicking on the following button.
+
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FMaximRouiller%2FRedditEmotionAnalyzer%2Fmaster%2Fdeployment%2Ftemplate.json)
+
+
 ## Build
 
 We need to first clone the repository.
