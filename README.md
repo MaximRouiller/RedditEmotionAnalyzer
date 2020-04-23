@@ -12,21 +12,14 @@ You will need the following:
 * Azure Account ([free trial available](https://azure.microsoft.com/free/?WT.mc_id=redditemotion-github-marouill))
 * Create a Cognitive Services Text Analytics service (see below)
 * Creating a `local.settings.json` file
-    * `CognitiveServices_Key` environment variable containing the Cognitive Services Key
-    * `CognitiveServices_Endpoint` environment variable containing the Cognitive Services Endpoint
-
-## Creating a Text Analytics Service
-
-This can be done by simply clicking the button below and filling the required fields.
-
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FMaximRouiller%2FOneClickCognitiveServices%2Fmaster%2Fcognitiveservices%2FTextAnalytics.json)
+  * `CognitiveServices_Key` environment variable containing the Cognitive Services Key
+  * `CognitiveServices_Endpoint` environment variable containing the Cognitive Services Endpoint
 
 ## Deploy Sample Resources
 
 All necessary resources to deploy this sample will be deployed by clicking on the following button.
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FMaximRouiller%2FRedditEmotionAnalyzer%2Fmaster%2Fdeployment%2Ftemplate.json)
-
 
 ## Build
 
