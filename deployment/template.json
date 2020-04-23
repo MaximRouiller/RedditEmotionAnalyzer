@@ -39,9 +39,6 @@
             "apiVersion": "2019-06-01",
             "name": "[parameters('storageAccounts_redditemotionanalyzerapp_name')]",
             "location": "eastus",
-            "tags": {
-                "hidden-related:/providers/Microsoft.Web/sites/RedditEmotionAnalyzerApp": "empty"
-            },
             "sku": {
                 "name": "Standard_LRS",
                 "tier": "Standard"
@@ -140,18 +137,6 @@
             "kind": "functionapp",
             "properties": {
                 "enabled": true,
-                "hostNameSslStates": [
-                    {
-                        "name": "redditemotionanalyzerapp20200415132941.azurewebsites.net",
-                        "sslState": "Disabled",
-                        "hostType": "Standard"
-                    },
-                    {
-                        "name": "redditemotionanalyzerapp20200415132941.scm.azurewebsites.net",
-                        "sslState": "Disabled",
-                        "hostType": "Repository"
-                    }
-                ],
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_EastUSPlan_name'))]",
                 "reserved": false,
                 "isXenon": false,
