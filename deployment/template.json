@@ -7,7 +7,7 @@
             "type": "String"
         },
         "storageAccountName": {
-            "defaultValue": "[toLower(concat(parameters('AzFunctionName'), 'storage'))]",
+            "defaultValue": "[concat(toLower(parameters('AzFunctionName')), 'storage')]",
             "type": "String"
         },
         "AzFunctionName": {
